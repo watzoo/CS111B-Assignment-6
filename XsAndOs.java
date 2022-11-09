@@ -1,3 +1,20 @@
+/*
+ *Algorithm
+ * 1. Create basic attributes for the game like the board, status label, and whever the game is over.
+ * 2. Create a 3x3 GridPane with indivudal cells
+ * 3. Create a scene to dispaly with 9 boxes
+ * 4. Create a method to determine if board is full
+ * 5. Create method to determine if there is a winner either diagonally, horizontally, or verticlally.
+ * 6. Create Cell class inlcuding a token for a blank space, X, or O.
+ * 7. Create main game method that determines what happens next and updates the board and status label.
+ */
+// Author(s): Daniel Lubin , Gabriel Lopez, Calvin Zhou 
+// Date of Last Modification: 11/8/2022
+// Course: CS111B 
+// Instructor: C. Conner 
+// Assignment #6
+// File Name: XsAndOs.Java
+// This program creates a Tic Tac Toe game with two players, X and O.
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -18,15 +35,11 @@ public class XsAndOs  extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
         GridPane pane = new GridPane(); 
-        //1) CODE HERE: use nested loop to create a Cell object for each location [row][col]in board 
-        //Also use pane.add(object, column, row) to add that Cell object to the GridPane 
+        // Nested loop that creates 9 spaces, made of a 3x3 gridpane
         for(int i = 0; i < board.length; i++){
             for(int j = 0; j < board.length; j++){
-                Cell box = new Cell();
-                pane.add(box,i,j);
-  
+                pane.add(board[i][j] = new Cell(), j, i);
             }
         }
 
@@ -39,17 +52,44 @@ public class XsAndOs  extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
-   /*  public boolean isFull() {
-        //2) CODE HERE to check if board is full  (don't forget to uncomment) 
-            }
-    } 
-    }
-
+    //Nested loop that goes through each cell and determines if the board is full.
+    public boolean isFull() {
+        for (int i = 0; i < 3; i++)
+          for (int j = 0; j < 3; j++)
+            if (board[i][j].getToken() == ' ')
+              return false;
+        return true;
+      }
     
-    /*public boolean hasWon(char tkn) {
-        //3) CODE HERE to check board to see if there is a winner (don't forget to uncomment
-    }*/
+    public boolean hasWon(char tkn) {
+        //Checks to see if there is a winner Horizontally
+        for(int i = 0; i < 3; i++){
+            if (board[i][0].getToken() == tkn &&
+                    board[i][1].getToken() == tkn &&
+                    (board[i][2].getToken() == tkn)) {
+                    return true;
+            }
+        //Checks for winner Vertically
+        for (int j = 0; j < 3; j++)
+            if (board[0][j].getToken() ==  tkn
+                && board[1][j].getToken() == tkn
+                && board[2][j].getToken() == tkn) {
+              return true;
+            }
+        //Checks for winner Diagonially top left to bottom right
+        if (board[0][0].getToken() == tkn 
+              && board[1][1].getToken() == tkn        
+              && board[2][2].getToken() == tkn) {
+            return true;
+          }
+        //Checks for winner diagonally top right to bottom left
+        if (board[0][2].getToken() == tkn
+              && board[1][1].getToken() == tkn
+              && board[2][0].getToken() == tkn) {
+            return true;
+          }
+    }   return false;
+    }
 
     //HERE IS INNER CLASS REPRESENTING ONE CELL IN BOARD
     //The inner class has access to all of the outer classes data/methods
@@ -66,14 +106,14 @@ public class XsAndOs  extends Application {
         }
 
         public char getToken() {
-            //4) CODE HERE note we are returning a char value 
+            //returns the token where called on 
             return token;
         }
 
+        //Draws 2 lines to represent the X player
         public void drawX() {
             double w = getWidth();
             double h = getHeight();
-            //5) CODE HERE TO CREATE TWO LINES FOR 'X' and then uncomment line below
             Line line1 = new Line(1,2,w,h);
             Line line2 = new Line(100,4,1,h);
             getChildren().addAll(line1, line2);
@@ -92,40 +132,48 @@ public class XsAndOs  extends Application {
         }
 
         public void setToken(char c) {
-            //setToken method draws X or O
-            //and then updates token to the argument passed
+            //setToken method draws X or O and updates token to the argument passed
             if (c == 'X')
                 drawX();
             else
                 drawO();
             token = c;
-            
             }
 
         //This is the 'listener' class that is run whenever a Cell object is mouseClicked
         //Each time a Cell is mouseClicked we need to check if gaveOver
         private void handleMouseClick() {
 
-            if (!gameOver) {
-                //8) CODE HERE FOR LOGIC OF THE GAME
-                //DON'T FORGET TO UPDATE whoseTurn
-                //Also UPDATE s TO LET USER KNOW WHAT IS HAPPENING   
+            if (!gameOver) {     
+                //Sets the clicked space to the token of the current player
                 setToken(whoseTurn);   
-                if (whoseTurn == 'X'){
+
+                //First checks if anyone has won and if so declares a winner
+                if(hasWon(whoseTurn)){
+                    statusLabel.setText(whoseTurn + " Has won!");
+                    whoseTurn = ' ';
+                    gameOver = true;
+                }
+                //If no winner checks if the board is full
+                else if (isFull()){
+                    statusLabel.setText("Draw!");
+                    whoseTurn = ' ';
+                    gameOver = true;
+                }
+                //If no winner and board is not full changes turn to the next player
+                else if (whoseTurn == 'X'){
                     whoseTurn = 'O';
+                    String s = whoseTurn + "'s Turn to Play!";
+                    statusLabel.setText(s);
                  }
                 else{
                     whoseTurn = 'X';
+                    String s = whoseTurn + "'s Turn to Play!";
+                    statusLabel.setText(s);
                 }
-                String s = whoseTurn + "'s Turn to Play!";
-                statusLabel.setText(s);
-
-                
             }
-            
         }
     }
-  
     public static void main(String[] args) {
         launch(args);
     }
